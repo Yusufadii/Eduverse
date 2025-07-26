@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
+
+// Konfigurasi Supabase - pastikan sama dengan AuthForms
+const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
 export default function Dashadmin() {
   const [users, setUsers] = useState([]);
@@ -12,7 +16,7 @@ export default function Dashadmin() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const supabase = createClient();
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const fetchUsers = async () => {
     try {
@@ -97,22 +101,38 @@ export default function Dashadmin() {
   }
 
   return (
+    
     <div className="w-screen max-w-screen-xl mx-auto px-4 gap-10 bg-white mt-10 text-[#131313]">
-      <h1 className="text-[40px] font-bold mb-4">All Users</h1>
-
-      {/* ✅ Added search input */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search by name or email..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full md:w-1/3 border border-[#ccc] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+      {/* Stats Summary */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h3 className="text-blue-800 font-semibold">Total Users</h3>
+          <p className="text-2xl font-bold text-blue-600">{users.length}</p>
+        </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h3 className="text-green-800 font-semibold">Active Users</h3>
+          <p className="text-2xl font-bold text-green-600">
+            {users.filter(user => user.status === 'active').length}
+          </p>
+        </div>
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <h3 className="text-purple-800 font-semibold">Admin Users</h3>
+          <p className="text-2xl font-bold text-purple-600">
+            {users.filter(user => user.role === 'admin').length}
+          </p>
+        </div>
       </div>
+      <h1 className="text-[40px] font-bold mb-4">All Users</h1>
 
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div className="flex items-center gap-4 w-full md:w-auto">
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full border border-[#ccc] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
           <label htmlFor="role" className="text-[16px]">Role:</label>
           <select
             id="role"
@@ -138,8 +158,8 @@ export default function Dashadmin() {
           </select>
         </div>
         
-        <Link href="/admin/adduser">
-          <button className="bg-gradient-to-r from-[#0066FF] to-[#0052CC] text-white px-4 py-2 rounded-md font-semibold gap-2">
+        <Link href="/dashboard/admin/adduser">
+          <button className="bg-gradient-to-r from-[#0066FF] to-[#0052CC] text-white px-4 py-2 rounded-md font-semibold gap-2 hover:from-[#0052CC] hover:to-[#003D99] transition-all duration-300">
             + Add Users
           </button>
         </Link>
@@ -181,7 +201,7 @@ export default function Dashadmin() {
                   </td>
                   <td className="p-5 capitalize">
                     <div className="flex justify-center gap-4 items-center">
-                      <Link href={`/admin/edituser/${user.id}`}>
+                      <Link href={`/dashboard/admin/edituser/${user.id}`}>
                         <button className="bg-[#FFD941] px-5 py-1 rounded-md text-[#131313] font-semibold hover:bg-[#FFD020] transition-colors">
                           Edit
                         </button>
