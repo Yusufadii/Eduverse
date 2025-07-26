@@ -10,7 +10,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'about', 'experience', 'project', 'certificate'];
+      const sections = ['home', 'about', 'courses', 'project', 'certificate'];
       const navbarHeight = 90;
       let currentActive = 'home';
 
@@ -75,7 +75,7 @@ export default function Header() {
           <button className={navItemClass('about')} onClick={() => scrollToSection('about')}>
             About
           </button>
-          <button className={navItemClass('experience')} onClick={() => scrollToSection('experience')}>
+          <button className={navItemClass('courses')} onClick={() => scrollToSection('courses')}>
             Course
           </button>
           <Link href="/AuthForms">
@@ -102,7 +102,7 @@ export default function Header() {
           <button className={navItemClass('about')} onClick={() => scrollToSection('about')}>
             About
           </button>
-          <button className={navItemClass('experience')} onClick={() => scrollToSection('experience')}>
+          <button className={navItemClass('courses')} onClick={() => scrollToSection('courses')}>
             Courses
           </button>
           

@@ -254,13 +254,6 @@ export default function ManageContentPage() {
                 <HiPlus className="text-lg" />
                 Add Content
               </Link>
-              <Link
-                href={`/dashboard/admin/courses/edit/${courseId}`}
-                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2"
-              >
-                <HiPencil className="text-lg" />
-                Edit Course
-              </Link>
             </div>
           </div>
         </div>
@@ -495,20 +488,6 @@ export default function ManageContentPage() {
             >
               <HiPlus className="text-sm" />
               Add New Content
-            </Link>
-            <Link
-              href={`/dashboard/admin/courses/view/${courseId}`}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-            >
-              <HiEye className="text-sm" />
-              Preview Course
-            </Link>
-            <Link
-              href={`/dashboard/admin/courses/edit/${courseId}`}
-              className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
-            >
-              <HiPencil className="text-sm" />
-              Edit Course Info
             </Link>
             <Link
               href="/dashboard/admin"

@@ -7,7 +7,7 @@ import { HiArrowLeft, HiPlus, HiDocument, HiPlay, HiCollection, HiPencil, HiSave
 
 // Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd285d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -498,49 +498,6 @@ export default function AddSingleContentPage() {
                   Back to Dashboard
                 </Link>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Content Guidelines */}
-        <div className="mt-8 bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="font-semibold text-gray-800 mb-4">📝 Content Guidelines</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <h4 className="font-medium text-blue-700 mb-2">📄 Lesson Content:</h4>
-              <ul className="text-gray-600 text-sm space-y-1">
-                <li>• Use clear headings and subheadings</li>
-                <li>• Include examples and explanations</li>
-                <li>• Add bullet points for key concepts</li>
-                <li>• Estimate reading time accurately</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-red-700 mb-2">🎥 Video Content:</h4>
-              <ul className="text-gray-600 text-sm space-y-1">
-                <li>• Paste YouTube or Vimeo URLs directly</li>
-                <li>• Or use HTML embed code</li>
-                <li>• Include video duration</li>
-                <li>• Add video description if needed</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-green-700 mb-2">📝 Quiz Content:</h4>
-              <ul className="text-gray-600 text-sm space-y-1">
-                <li>• Use JSON format for questions</li>
-                <li>• Include multiple choice options</li>
-                <li>• Set correct answers clearly</li>
-                <li>• Add explanation for answers</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-orange-700 mb-2">📋 Assignment Content:</h4>
-              <ul className="text-gray-600 text-sm space-y-1">
-                <li>• Provide clear instructions</li>
-                <li>• Set submission requirements</li>
-                <li>• Include grading criteria</li>
-                <li>• Add deadline if applicable</li>
-              </ul>
             </div>
           </div>
         </div>

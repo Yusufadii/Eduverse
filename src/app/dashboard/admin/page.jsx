@@ -498,11 +498,6 @@ export default function AdminDashboard() {
                                 <HiEye className="text-sm" />
                               </button>
                             </Link>
-                            <Link href={`/dashboard/admin/courses/edit/${course.id}`}>
-                              <button className="bg-[#FFD941] p-2 rounded-md text-[#131313] hover:bg-[#FFD020] transition-colors" title="Edit Course">
-                                <HiPencil className="text-sm" />
-                              </button>
-                            </Link>
                             <button
                               onClick={() => handleDeleteCourse(course.id, course.title)}
                               className="bg-[#AA0000] p-2 rounded-md text-white hover:bg-[#CC0000] transition-colors"
