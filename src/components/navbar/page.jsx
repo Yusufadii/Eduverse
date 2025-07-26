@@ -1,5 +1,6 @@
 'use client'
 import Image from 'next/image';
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { HiOutlineMenuAlt3, HiOutlineX } from 'react-icons/hi';
 
@@ -47,7 +48,7 @@ export default function Header() {
         window.history.pushState(null, '', `#${sectionId}`);
       }
 
-      setMenuOpen(false); // close menu after click
+      setMenuOpen(false);
     }
   };
 
@@ -59,54 +60,58 @@ export default function Header() {
     }`;
 
   return (
-      <div className="shadow-[0_6px_10px_rgba(0,0,0,0.06)] bg-white">
-        <div className="flex justify-between items-center max-w-screen-xl mx-auto py-6 px-4">
-          {/* Logo */}
-          <div>
-            <Image src="/images/Logo.png" width={150} height={150} alt="Eduverse Logo" />
-          </div>
+    <div className="shadow-[0_6px_10px_rgba(0,0,0,0.06)] bg-white">
+      <div className="flex justify-between items-center max-w-screen-xl mx-auto py-6 px-4">
+        {/* Logo */}
+        <div>
+          <Image src="/images/Logo.png" width={150} height={150} alt="Eduverse Logo" />
+        </div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex gap-10 items-center">
-            <button className={navItemClass('home')} onClick={() => scrollToSection('home')}>
-              Home
-            </button>
-            <button className={navItemClass('about')} onClick={() => scrollToSection('about')}>
-              About
-            </button>
-            <button className={navItemClass('experience')} onClick={() => scrollToSection('experience')}>
-              Course
-            </button>
+        {/* Desktop Menu */}
+        <div className="hidden md:flex gap-10 items-center">
+          <button className={navItemClass('home')} onClick={() => scrollToSection('home')}>
+            Home
+          </button>
+          <button className={navItemClass('about')} onClick={() => scrollToSection('about')}>
+            About
+          </button>
+          <button className={navItemClass('experience')} onClick={() => scrollToSection('experience')}>
+            Course
+          </button>
+          <Link href="/AuthForms">
             <button className="bg-[#0066FF] px-6 py-1 text-[18px] font-bold text-white rounded-lg hover:bg-[#0049B7] transition-all ease-in-out duration-500">
               Join Us!
             </button>
-          </div>
-
-          {/* Mobile Hamburger */}
-          <div className="md:hidden">
-            <button onClick={() => setMenuOpen(!menuOpen)} className="text-3xl text-[#131313]">
-              {menuOpen ? <HiOutlineX /> : <HiOutlineMenuAlt3 />}
-            </button>
-          </div>
+          </Link>
         </div>
 
-        {/* Mobile Menu */}
-        {menuOpen && (
-          <div className="md:hidden flex flex-col items-start gap-5 pb-6 ps-5">
-            <button className={navItemClass('home')} onClick={() => scrollToSection('home')}>
-              Home
-            </button>
-            <button className={navItemClass('about')} onClick={() => scrollToSection('about')}>
-              About
-            </button>
-            <button className={navItemClass('experience')} onClick={() => scrollToSection('experience')}>
-              Course
-            </button>
-            <button className="bg-[#0066FF] px-6 py-2 text-[18px] font-bold text-white rounded-lg hover:bg-[#0049B7] transition-all ease-in-out duration-500">
-              Join Us!
-            </button>
-          </div>
-        )}
+        {/* Mobile Hamburger */}
+        <div className="md:hidden">
+          <button onClick={() => setMenuOpen(!menuOpen)} className="text-3xl text-[#131313]">
+            {menuOpen ? <HiOutlineX /> : <HiOutlineMenuAlt3 />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="md:hidden flex flex-col items-start gap-5 pb-6 ps-5">
+          <button className={navItemClass('home')} onClick={() => scrollToSection('home')}>
+            Home
+          </button>
+          <button className={navItemClass('about')} onClick={() => scrollToSection('about')}>
+            About
+          </button>
+          <button className={navItemClass('experience')} onClick={() => scrollToSection('experience')}>
+            Courses
+          </button>
+          
+          {/* Mobile Auth Buttons */}
+          <button className="bg-[#0066FF] px-6 py-2 text-[18px] font-bold text-white rounded-lg hover:bg-[#0049B7] transition-all ease-in-out duration-500 w-fit">
+            Join Us!
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
