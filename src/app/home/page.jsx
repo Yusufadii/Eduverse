@@ -2,10 +2,13 @@
 import React from "react";
 import Image from "next/image";
 import CountUp from "@/components/counter/page";
+import Header from "@/components/navbar/page";
+import Footer from "@/components/footer/page";
 
 export default function Homepage() {
   return (
     <>
+    <Header/>
       <div className="flex flex-col md:flex-row justify-between w-screen max-w-screen-xl mx-auto px-4 gap-10 bg-white mt-10">
         <div>
           <h1 className="text-[45px] md:text-[50px] font-bold text-[#131313]">
@@ -258,6 +261,7 @@ export default function Homepage() {
           </div>
         </div>
       </div>
+    <Footer/>
     </>
   );
 }

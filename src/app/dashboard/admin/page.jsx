@@ -109,6 +109,22 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleLogout = async () => {
+  try {
+    // Hapus session di localStorage (kalau lo pake custom user)
+    localStorage.removeItem('currentUser');
+
+    // Logout Supabase session
+    await supabase.auth.signOut();
+
+    // Redirect ke halaman login atau landing page
+    window.location.href = '/home'; // ubah sesuai routing lo
+  } catch (error) {
+    console.error('Logout gagal:', error);
+    alert('Terjadi kesalahan saat logout');
+  }
+};
+
   // Delete Course
   const handleDeleteCourse = async (id, title) => {
     const confirmDelete = confirm(`Yakin mau hapus course "${title}"?`);
@@ -169,9 +185,18 @@ export default function AdminDashboard() {
   return (
     <div className="w-screen max-w-screen-xl mx-auto px-4 gap-10 bg-white mt-10 text-[#131313]">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-[40px] font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">Manage users and courses for Eduverse platform</p>
+
+      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-[40px] font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600">Manage users and courses for Eduverse platform</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-md font-semibold transition-all"
+        >
+          Logout
+        </button>
       </div>
 
       {/* Overall Stats */}

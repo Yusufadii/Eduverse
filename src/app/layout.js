@@ -12,9 +12,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <ConditionalNavbar />
         {children}
-        <Footer/>
       </body>
     </html>
   );

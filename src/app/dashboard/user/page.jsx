@@ -33,6 +33,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   }
 });
 
+const extractYouTubeId = (url) => {
+  const match = url.match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/))([\w-]{11})/
+  );
+  return match ? match[1] : '';
+};
+
+
 const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('all-courses');
   const [searchTerm, setSearchTerm] = useState('');
@@ -731,14 +739,15 @@ const UserDashboard = () => {
                   
                   <div className="prose max-w-none">
                     {selectedContent.type === 'video' && selectedContent.content && (
-                      <div className="mb-4">
-                        <video 
-                          controls 
-                          className="w-full rounded-lg"
-                          src={selectedContent.content}
-                        >
-                          Your browser does not support the video tag.
-                        </video>
+                      <div className="aspect-video mb-4">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${extractYouTubeId(selectedContent.content)}`}
+                          title={selectedContent.title}
+                          className="w-full h-full rounded-lg"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        ></iframe>
                       </div>
                     )}
                     
