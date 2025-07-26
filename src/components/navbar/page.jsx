@@ -80,7 +80,7 @@ export default function Header() {
           </button>
           <Link href="/AuthForms">
             <button className="bg-[#0066FF] px-6 py-1 text-[18px] font-bold text-white rounded-lg hover:bg-[#0049B7] transition-all ease-in-out duration-500">
-              Join Us!
+              Join Us!!
             </button>
           </Link>
         </div>
