@@ -143,7 +143,7 @@ export default function AuthFormsPage() {
       }
 
       console.log('User berhasil didaftarkan:', data);
-      showMessage('Pendaftaran berhasil! Silakan login.', 'success');
+      showMessage(`Pendaftaran berhasil sebagai ${registerRole}! Silakan login.`, 'success');
       
       setTimeout(() => {
         toggleForm();
@@ -228,7 +228,7 @@ export default function AuthFormsPage() {
           </div>
         ) : (
           // Register Form
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nama:
@@ -273,7 +273,7 @@ export default function AuthFormsPage() {
             </div>
             <button
               onClick={registerUser}
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all transform hover:-translate-y-1 shadow-lg"
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all transform hover:-translate-y-1 shadow-lg mt-6"
             >
               Daftar
             </button>
