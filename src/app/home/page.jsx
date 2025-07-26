@@ -6,7 +6,7 @@ import CountUp from "@/components/counter/page";
 export default function Homepage() {
   return (
     <>
-      <div className="flex flex-col md:flex-row justify-between w-screen max-w-screen-xl mx-auto px-4 gap-10 bg-white">
+      <div className="flex flex-col md:flex-row justify-between w-screen max-w-screen-xl mx-auto px-4 gap-10 bg-white mt-10">
         <div>
           <h1 className="text-[45px] md:text-[50px] font-bold text-[#131313]">
             Lorem Ipsum{" "}

@@ -276,27 +276,7 @@ export default function AuthFormsPage() {
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors"
                 required
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Daftar Sebagai:
-              </label>
-              <select
-                name="registerRole"
-                value={formData.registerRole}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none transition-colors bg-white"
-              >
-                <option value="user">👤 User/Student</option>
-                <option value="admin">👑 Admin/Teacher</option>
-              </select>
-            </div>
-            
-            {/* Debug info - hapus setelah testing */}
-            <div className="text-xs text-gray-500 p-2 bg-gray-50 rounded">
-              Role terpilih: <strong>{formData.registerRole}</strong>
-            </div>
-            
+            </div>    
             <button
               onClick={registerUser}
               className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all transform hover:-translate-y-1 shadow-lg mt-6"

@@ -16,7 +16,12 @@ import {
   HiPencil,
   HiTrash,
   HiSave,
-  HiEye
+  HiEye,
+  HiUpload,
+  HiVideoCamera,
+  HiDocumentText,
+  HiLink,
+  HiX
 } from 'react-icons/hi';
 
 // Konfigurasi Supabase
@@ -55,8 +60,15 @@ export default function ComprehensiveAddCoursePage() {
     type: 'lesson',
     content: '',
     duration: '',
-    order_index: 1
+    order_index: 1,
+    youtube_url: '',
+    pdf_file: null,
+    pdf_url: ''
   });
+
+  // File upload states
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [pdfPreview, setPdfPreview] = useState(null);
 
   // Get current user from localStorage
   React.useEffect(() => {
@@ -71,6 +83,85 @@ export default function ComprehensiveAddCoursePage() {
     setTimeout(() => {
       setMessage({ text: '', type: '' });
     }, 5000);
+  };
+
+  // Helper function to extract YouTube video ID
+  const extractYouTubeId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  // Helper function to validate YouTube URL
+  const isValidYouTubeUrl = (url) => {
+    return extractYouTubeId(url) !== null;
+  };
+
+  // Upload PDF to Supabase Storage
+  const uploadPdfFile = async (file) => {
+    try {
+      setUploadingPdf(true);
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `course_materials/${fileName}`;
+
+      // Upload file to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('uploads') // Make sure this bucket exists in your Supabase project
+        .upload(filePath, file);
+
+      if (error) {
+        throw error;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filePath);
+
+      setUploadingPdf(false);
+      return publicUrl;
+    } catch (error) {
+      setUploadingPdf(false);
+      throw error;
+    }
+  };
+
+  // Handle PDF file selection
+  const handlePdfFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      showMessage('Please select a PDF file only', 'error');
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showMessage('PDF file size should be less than 10MB', 'error');
+      return;
+    }
+
+    try {
+      const pdfUrl = await uploadPdfFile(file);
+      setContentForm({
+        ...contentForm,
+        pdf_file: file,
+        pdf_url: pdfUrl
+      });
+      setPdfPreview({
+        name: file.name,
+        size: file.size,
+        url: pdfUrl
+      });
+      showMessage('PDF uploaded successfully!', 'success');
+    } catch (error) {
+      showMessage('Failed to upload PDF: ' + error.message, 'error');
+    }
   };
 
   // Course handlers
@@ -91,14 +182,71 @@ export default function ComprehensiveAddCoursePage() {
     });
   };
 
+  const validateContentForm = () => {
+    if (!contentForm.title.trim()) {
+      showMessage('Content title is required', 'error');
+      return false;
+    }
+
+    // Validate based on content type
+    switch (contentForm.type) {
+      case 'video':
+        if (!contentForm.youtube_url.trim()) {
+          showMessage('YouTube URL is required for video content', 'error');
+          return false;
+        }
+        if (!isValidYouTubeUrl(contentForm.youtube_url)) {
+          showMessage('Please enter a valid YouTube URL', 'error');
+          return false;
+        }
+        break;
+      case 'pdf':
+        if (!contentForm.pdf_url && !contentForm.content.trim()) {
+          showMessage('PDF file or content description is required', 'error');
+          return false;
+        }
+        break;
+      case 'lesson':
+      case 'quiz':
+      case 'assignment':
+        if (!contentForm.content.trim()) {
+          showMessage('Content description is required', 'error');
+          return false;
+        }
+        break;
+    }
+
+    return true;
+  };
+
   const addContent = () => {
-    if (!contentForm.title.trim() || !contentForm.content.trim()) {
-      showMessage('Content title and description are required', 'error');
-      return;
+    if (!validateContentForm()) return;
+
+    let finalContent = contentForm.content;
+    
+    // Prepare content based on type
+    switch (contentForm.type) {
+      case 'video':
+        const videoId = extractYouTubeId(contentForm.youtube_url);
+        finalContent = JSON.stringify({
+          description: contentForm.content,
+          youtube_id: videoId,
+          youtube_url: contentForm.youtube_url,
+          embed_url: `https://www.youtube.com/embed/${videoId}`
+        });
+        break;
+      case 'pdf':
+        finalContent = JSON.stringify({
+          description: contentForm.content,
+          pdf_url: contentForm.pdf_url,
+          pdf_filename: contentForm.pdf_file?.name || 'document.pdf'
+        });
+        break;
     }
 
     const newContent = {
       ...contentForm,
+      content: finalContent,
       id: Date.now(), // Temporary ID
       order_index: contentList.length + 1
     };
@@ -115,18 +263,53 @@ export default function ComprehensiveAddCoursePage() {
     }
 
     // Reset form
+    resetContentForm();
+  };
+
+  const resetContentForm = () => {
     setContentForm({
       title: '',
       type: 'lesson',
       content: '',
       duration: '',
-      order_index: contentList.length + 2
+      order_index: contentList.length + 2,
+      youtube_url: '',
+      pdf_file: null,
+      pdf_url: ''
     });
+    setPdfPreview(null);
     setShowContentForm(false);
   };
 
   const editContent = (index) => {
-    setContentForm(contentList[index]);
+    const content = contentList[index];
+    let formData = { ...content };
+
+    // Parse content based on type
+    try {
+      if (content.type === 'video' || content.type === 'pdf') {
+        const parsedContent = JSON.parse(content.content);
+        formData.content = parsedContent.description || '';
+        
+        if (content.type === 'video') {
+          formData.youtube_url = parsedContent.youtube_url || '';
+        }
+        
+        if (content.type === 'pdf') {
+          formData.pdf_url = parsedContent.pdf_url || '';
+          if (parsedContent.pdf_url) {
+            setPdfPreview({
+              name: parsedContent.pdf_filename || 'document.pdf',
+              url: parsedContent.pdf_url
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // If content is not JSON, use as is
+    }
+
+    setContentForm(formData);
     setEditingContentIndex(index);
     setShowContentForm(true);
   };
@@ -141,11 +324,65 @@ export default function ComprehensiveAddCoursePage() {
   const getTypeIcon = (type) => {
     switch (type) {
       case 'lesson': return <HiDocument className="text-blue-500" />;
-      case 'video': return <HiPlay className="text-red-500" />;
+      case 'video': return <HiVideoCamera className="text-red-500" />;
+      case 'pdf': return <HiDocumentText className="text-orange-500" />;
       case 'quiz': return <HiCollection className="text-green-500" />;
-      case 'assignment': return <HiPencil className="text-orange-500" />;
+      case 'assignment': return <HiPencil className="text-purple-500" />;
       default: return <HiDocument className="text-gray-500" />;
     }
+  };
+
+  const renderContentPreview = (content) => {
+    try {
+      if (content.type === 'video') {
+        const parsedContent = JSON.parse(content.content);
+        return (
+          <div className="mt-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+              <HiVideoCamera className="text-red-500" />
+              <span>YouTube Video</span>
+            </div>
+            <div className="bg-gray-100 rounded p-2">
+              <a 
+                href={parsedContent.youtube_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline text-sm"
+              >
+                {parsedContent.youtube_url}
+              </a>
+            </div>
+          </div>
+        );
+      }
+      
+      if (content.type === 'pdf') {
+        const parsedContent = JSON.parse(content.content);
+        return (
+          <div className="mt-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+              <HiDocumentText className="text-orange-500" />
+              <span>PDF Document</span>
+            </div>
+            <div className="bg-gray-100 rounded p-2 flex items-center justify-between">
+              <span className="text-sm">{parsedContent.pdf_filename}</span>
+              <a 
+                href={parsedContent.pdf_url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 text-sm"
+              >
+                <HiEye className="inline" /> View
+              </a>
+            </div>
+          </div>
+        );
+      }
+    } catch (e) {
+      // If content is not JSON, show regular content
+    }
+    
+    return null;
   };
 
   const validateCourse = () => {
@@ -281,7 +518,7 @@ export default function ComprehensiveAddCoursePage() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">Create New Course</h1>
-                  <p className="text-gray-600">Build a complete course with content</p>
+                  <p className="text-gray-600">Build a complete course with multimedia content</p>
                 </div>
               </div>
             </div>
@@ -548,7 +785,7 @@ export default function ComprehensiveAddCoursePage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-lg font-semibold text-gray-800">Course Content</h2>
-                      <p className="text-gray-600 text-sm">Add lessons, videos, quizzes, and assignments</p>
+                      <p className="text-gray-600 text-sm">Add lessons, videos, PDFs, quizzes, and assignments</p>
                     </div>
                     <button
                       onClick={() => setShowContentForm(!showContentForm)}
@@ -564,9 +801,17 @@ export default function ComprehensiveAddCoursePage() {
                   {/* Content Form */}
                   {showContentForm && (
                     <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                      <h3 className="text-lg font-medium text-gray-800 mb-4">
-                        {editingContentIndex !== null ? 'Edit Content' : 'Add New Content'}
-                      </h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-medium text-gray-800">
+                          {editingContentIndex !== null ? 'Edit Content' : 'Add New Content'}
+                        </h3>
+                        <button
+                          onClick={resetContentForm}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <HiX className="text-xl" />
+                        </button>
+                      </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="md:col-span-2">
@@ -594,8 +839,9 @@ export default function ComprehensiveAddCoursePage() {
                             onChange={handleContentChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                           >
-                            <option value="lesson">📄 Lesson</option>
-                            <option value="video">🎥 Video</option>
+                            <option value="lesson">📄 Text Lesson</option>
+                            <option value="video">🎥 YouTube Video</option>
+                            <option value="pdf">📄 PDF Document</option>
                             <option value="quiz">📝 Quiz</option>
                             <option value="assignment">📋 Assignment</option>
                           </select>
@@ -615,9 +861,128 @@ export default function ComprehensiveAddCoursePage() {
                           />
                         </div>
 
+                        {/* YouTube URL field for video content */}
+                        {contentForm.type === 'video' && (
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              <HiVideoCamera className="inline mr-2 text-red-500" />
+                              YouTube URL *
+                            </label>
+                            <input
+                              type="url"
+                              name="youtube_url"
+                              value={contentForm.youtube_url}
+                              onChange={handleContentChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="https://www.youtube.com/watch?v=..."
+                              required
+                            />
+                            {contentForm.youtube_url && isValidYouTubeUrl(contentForm.youtube_url) && (
+                              <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div className="flex items-center gap-2 text-green-700">
+                                  <span className="text-sm">✓ Valid YouTube URL detected</span>
+                                </div>
+                                <div className="mt-2">
+                                  <iframe
+                                    width="300"
+                                    height="169"
+                                    src={`https://www.youtube.com/embed/${extractYouTubeId(contentForm.youtube_url)}`}
+                                    frameBorder="0"
+                                    allowFullScreen
+                                    className="rounded"
+                                  ></iframe>
+                                </div>
+                              </div>
+                            )}
+                            {contentForm.youtube_url && !isValidYouTubeUrl(contentForm.youtube_url) && (
+                              <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                                ⚠ Please enter a valid YouTube URL
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* PDF Upload field for PDF content */}
+                        {contentForm.type === 'pdf' && (
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              <HiDocumentText className="inline mr-2 text-orange-500" />
+                              PDF Document *
+                            </label>
+                            
+                            {!pdfPreview ? (
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                                <input
+                                  type="file"
+                                  accept=".pdf"
+                                  onChange={handlePdfFileChange}
+                                  className="hidden"
+                                  id="pdf-upload"
+                                  disabled={uploadingPdf}
+                                />
+                                <label
+                                  htmlFor="pdf-upload"
+                                  className="cursor-pointer flex flex-col items-center"
+                                >
+                                  {uploadingPdf ? (
+                                    <>
+                                      <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-2"></div>
+                                      <span className="text-sm text-gray-600">Uploading PDF...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <HiUpload className="text-3xl text-gray-400 mb-2" />
+                                      <span className="text-sm text-gray-600">
+                                        Click to upload PDF file (Max 10MB)
+                                      </span>
+                                    </>
+                                  )}
+                                </label>
+                              </div>
+                            ) : (
+                              <div className="border border-gray-300 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <HiDocumentText className="text-2xl text-orange-500" />
+                                    <div>
+                                      <div className="font-medium text-gray-800">{pdfPreview.name}</div>
+                                      {pdfPreview.size && (
+                                        <div className="text-sm text-gray-600">
+                                          {(pdfPreview.size / (1024 * 1024)).toFixed(2)} MB
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <a
+                                      href={pdfPreview.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
+                                    >
+                                      <HiEye /> Preview
+                                    </a>
+                                    <button
+                                      onClick={() => {
+                                        setPdfPreview(null);
+                                        setContentForm({ ...contentForm, pdf_file: null, pdf_url: '' });
+                                      }}
+                                      className="text-red-600 hover:text-red-800 text-sm"
+                                    >
+                                      <HiTrash />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         <div className="md:col-span-2">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Content *
+                            {contentForm.type === 'video' ? 'Video Description' : 
+                             contentForm.type === 'pdf' ? 'PDF Description' : 'Content'} 
+                            {contentForm.type !== 'pdf' && ' *'}
                           </label>
                           <textarea
                             name="content"
@@ -625,8 +990,12 @@ export default function ComprehensiveAddCoursePage() {
                             onChange={handleContentChange}
                             rows={4}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter content description or embed code..."
-                            required
+                            placeholder={
+                              contentForm.type === 'video' ? 'Describe what this video covers...' :
+                              contentForm.type === 'pdf' ? 'Describe the PDF content (optional)...' :
+                              'Enter content description...'
+                            }
+                            required={contentForm.type !== 'pdf'}
                           />
                         </div>
                       </div>
@@ -634,22 +1003,13 @@ export default function ComprehensiveAddCoursePage() {
                       <div className="flex gap-3 mt-4">
                         <button
                           onClick={addContent}
-                          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                          disabled={uploadingPdf}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
                         >
                           {editingContentIndex !== null ? 'Update Content' : 'Add Content'}
                         </button>
                         <button
-                          onClick={() => {
-                            setShowContentForm(false);
-                            setEditingContentIndex(null);
-                            setContentForm({
-                              title: '',
-                              type: 'lesson',
-                              content: '',
-                              duration: '',
-                              order_index: 1
-                            });
-                          }}
+                          onClick={resetContentForm}
                           className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           Cancel
@@ -664,7 +1024,7 @@ export default function ComprehensiveAddCoursePage() {
                       <div className="text-center py-12">
                         <HiDocument className="text-6xl text-gray-300 mx-auto mb-4" />
                         <h3 className="text-xl font-medium text-gray-600 mb-2">No content added yet</h3>
-                        <p className="text-gray-500 mb-4">Start by adding your first lesson or video</p>
+                        <p className="text-gray-500 mb-4">Start by adding your first lesson, video, or PDF</p>
                         <button
                           onClick={() => setShowContentForm(true)}
                           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -687,17 +1047,42 @@ export default function ComprehensiveAddCoursePage() {
                                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                     content.type === 'lesson' ? 'bg-blue-100 text-blue-700' :
                                     content.type === 'video' ? 'bg-red-100 text-red-700' :
+                                    content.type === 'pdf' ? 'bg-orange-100 text-orange-700' :
                                     content.type === 'quiz' ? 'bg-green-100 text-green-700' :
-                                    'bg-orange-100 text-orange-700'
+                                    'bg-purple-100 text-purple-700'
                                   }`}>
                                     {content.type}
                                   </span>
                                 </div>
-                                <p className="text-gray-600 text-sm line-clamp-2 mb-2">
-                                  {content.content.length > 100 
-                                    ? content.content.substring(0, 100) + '...' 
-                                    : content.content}
-                                </p>
+                                
+                                {/* Content preview based on type */}
+                                {renderContentPreview(content)}
+                                
+                                {/* Regular content description */}
+                                {content.type === 'lesson' || content.type === 'quiz' || content.type === 'assignment' ? (
+                                  <p className="text-gray-600 text-sm line-clamp-2 mb-2">
+                                    {content.content.length > 100 
+                                      ? content.content.substring(0, 100) + '...' 
+                                      : content.content}
+                                  </p>
+                                ) : (
+                                  // For video and PDF, show description from parsed content
+                                  (() => {
+                                    try {
+                                      const parsedContent = JSON.parse(content.content);
+                                      return parsedContent.description && (
+                                        <p className="text-gray-600 text-sm line-clamp-2 mb-2">
+                                          {parsedContent.description.length > 100 
+                                            ? parsedContent.description.substring(0, 100) + '...' 
+                                            : parsedContent.description}
+                                        </p>
+                                      );
+                                    } catch (e) {
+                                      return null;
+                                    }
+                                  })()
+                                )}
+                                
                                 {content.duration && (
                                   <div className="flex items-center gap-1 text-sm text-gray-500">
                                     <HiClock className="text-xs" />
@@ -809,9 +1194,9 @@ export default function ComprehensiveAddCoursePage() {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-orange-600">
-                      {contentList.filter(c => c.type === 'assignment').length}
+                      {contentList.filter(c => c.type === 'pdf').length}
                     </div>
-                    <div className="text-sm text-gray-600">Assignments</div>
+                    <div className="text-sm text-gray-600">PDFs</div>
                   </div>
                 </div>
               </div>
@@ -903,6 +1288,7 @@ export default function ComprehensiveAddCoursePage() {
                       });
                       setContentList([]);
                       setActiveStep(1);
+                      setPdfPreview(null);
                     }
                   }}
                   className="w-full py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
