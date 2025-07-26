@@ -748,20 +748,37 @@ const UserDashboard = () => {
                       </div>
                     )}
                     
-                    {selectedContent.type === 'document' && selectedContent.content && (
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                        <Download className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                        <p className="text-gray-600 mb-4">Document available for download</p>
-                        <a 
-                          href={selectedContent.content}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          Download Document
-                        </a>
-                      </div>
-                    )}
+                    {['document', 'pdf'].includes(selectedContent.type?.toLowerCase()) && selectedContent.content && (() => {
+                      let contentObj = selectedContent.content;
+                      if (typeof contentObj === 'string') {
+                        try {
+                          contentObj = JSON.parse(contentObj);
+                        } catch (e) {
+                          console.warn('Content bukan JSON:', selectedContent.content);
+                        }
+                      }
+
+                      if (contentObj?.pdf_url) {
+                        return (
+                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                            <Download className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                            <p className="text-gray-600 mb-4">
+                              {contentObj.description || 'Dokumen siap diunduh'}
+                            </p>
+                            <a 
+                              href={contentObj.pdf_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                              {contentObj.pdf_filename || 'Download PDF'}
+                            </a>
+                          </div>
+                        );
+                      }
+
+                      return <p className="text-gray-500">❌ Dokumen tidak ditemukan.</p>;
+                    })()}
                   </div>
                 </div>
               ) : (
