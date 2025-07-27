@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { HiArrowLeft, HiPencil, HiUser, HiMail, HiLockClosed, HiUserGroup } from 'react-icons/hi';
 
-// Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -30,7 +29,6 @@ export default function EditUserPage() {
   });
   const [originalData, setOriginalData] = useState({});
 
-  // Fetch user data saat component mount
   useEffect(() => {
     if (userId) {
       fetchUserData();
@@ -104,7 +102,6 @@ export default function EditUserPage() {
       return false;
     }
 
-    // Validasi password hanya jika akan diubah
     if (changePassword) {
       if (!password) {
         showMessage('Password tidak boleh kosong', 'error');
@@ -133,7 +130,6 @@ export default function EditUserPage() {
     setIsLoading(true);
 
     try {
-      // Cek apakah email sudah digunakan user lain
       if (formData.email !== originalData.email) {
         const { data: existingUser, error: checkError } = await supabase
           .from('users')
@@ -155,7 +151,6 @@ export default function EditUserPage() {
         }
       }
 
-      // Siapkan data untuk update
       const updateData = {
         nama: formData.nama.trim(),
         email: formData.email.trim().toLowerCase(),
@@ -163,12 +158,10 @@ export default function EditUserPage() {
         status: formData.status
       };
 
-      // Tambahkan password jika akan diubah
       if (changePassword && formData.password) {
         updateData.password = formData.password;
       }
 
-      // Update user data
       const { data, error } = await supabase
         .from('users')
         .update(updateData)
@@ -183,7 +176,6 @@ export default function EditUserPage() {
 
       showMessage(`User ${formData.nama} berhasil diupdate!`, 'success');
       
-      // Redirect ke halaman users setelah 2 detik
       setTimeout(() => {
         router.push('/dashboard/admin/');
       }, 2000);
@@ -213,7 +205,6 @@ export default function EditUserPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -238,7 +229,6 @@ export default function EditUserPage() {
           </div>
         </div>
 
-        {/* Alert Message */}
         {message.text && (
           <div className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success' 
@@ -260,7 +250,6 @@ export default function EditUserPage() {
           </div>
         )}
 
-        {/* Form */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800">Informasi User</h2>
@@ -269,7 +258,6 @@ export default function EditUserPage() {
 
           <form onSubmit={handleSubmit} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Nama */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiUser className="inline mr-2" />
@@ -286,7 +274,6 @@ export default function EditUserPage() {
                 />
               </div>
 
-              {/* Email */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiMail className="inline mr-2" />
@@ -303,7 +290,6 @@ export default function EditUserPage() {
                 />
               </div>
 
-              {/* Password Section */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-2 mb-4">
                   <input
@@ -351,7 +337,6 @@ export default function EditUserPage() {
                 )}
               </div>
 
-              {/* Role */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiUserGroup className="inline mr-2" />
@@ -368,7 +353,6 @@ export default function EditUserPage() {
                 </select>
               </div>
 
-              {/* Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Status *
@@ -385,7 +369,6 @@ export default function EditUserPage() {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-4 mt-8">
               <button
                 type="submit"

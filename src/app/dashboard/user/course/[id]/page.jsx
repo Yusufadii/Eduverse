@@ -18,7 +18,6 @@ import {
   Award
 } from 'lucide-react';
 
-// Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -92,7 +91,6 @@ const CourseDetailView = ({ courseId = 1 }) => {
       if (error) throw error;
       setCourseContent(data || []);
       
-      // Set first content as selected by default
       if (data && data.length > 0) {
         setSelectedContent(data[0]);
       }
@@ -195,7 +193,6 @@ const CourseDetailView = ({ courseId = 1 }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -229,9 +226,7 @@ const CourseDetailView = ({ courseId = 1 }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content Area */}
           <div className="lg:col-span-2">
-            {/* Course Info Card */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <div className="flex gap-6">
                 <div className="flex-shrink-0">
@@ -305,7 +300,6 @@ const CourseDetailView = ({ courseId = 1 }) => {
               )}
             </div>
 
-            {/* Selected Content Display */}
             {selectedContent && isEnrolled && (
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -385,7 +379,6 @@ const CourseDetailView = ({ courseId = 1 }) => {
             )}
           </div>
 
-          {/* Sidebar - Course Content List */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">

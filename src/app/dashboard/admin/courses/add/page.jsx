@@ -24,7 +24,6 @@ import {
   HiX
 } from 'react-icons/hi';
 
-// Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -35,9 +34,8 @@ export default function ComprehensiveAddCoursePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [currentUser, setCurrentUser] = useState(null);
-  const [activeStep, setActiveStep] = useState(1); // 1: Course Info, 2: Content
+  const [activeStep, setActiveStep] = useState(1);
 
-  // Course Data
   const [courseData, setCourseData] = useState({
     title: '',
     description: '',
@@ -51,7 +49,6 @@ export default function ComprehensiveAddCoursePage() {
     rating: 0
   });
 
-  // Content Data
   const [contentList, setContentList] = useState([]);
   const [showContentForm, setShowContentForm] = useState(false);
   const [editingContentIndex, setEditingContentIndex] = useState(null);
@@ -66,11 +63,9 @@ export default function ComprehensiveAddCoursePage() {
     pdf_url: ''
   });
 
-  // File upload states
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [pdfPreview, setPdfPreview] = useState(null);
 
-  // Get current user from localStorage
   React.useEffect(() => {
     const userData = localStorage.getItem('currentUser');
     if (userData) {
@@ -85,38 +80,32 @@ export default function ComprehensiveAddCoursePage() {
     }, 5000);
   };
 
-  // Helper function to extract YouTube video ID
   const extractYouTubeId = (url) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  // Helper function to validate YouTube URL
   const isValidYouTubeUrl = (url) => {
     return extractYouTubeId(url) !== null;
   };
 
-  // Upload PDF to Supabase Storage
   const uploadPdfFile = async (file) => {
     try {
       setUploadingPdf(true);
       
-      // Generate unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `course_materials/${fileName}`;
 
-      // Upload file to Supabase Storage
       const { data, error } = await supabase.storage
-        .from('uploads') // Make sure this bucket exists in your Supabase project
+        .from('uploads')
         .upload(filePath, file);
 
       if (error) {
         throw error;
       }
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('uploads')
         .getPublicUrl(filePath);
@@ -129,18 +118,15 @@ export default function ComprehensiveAddCoursePage() {
     }
   };
 
-  // Handle PDF file selection
   const handlePdfFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (file.type !== 'application/pdf') {
       showMessage('Please select a PDF file only', 'error');
       return;
     }
 
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       showMessage('PDF file size should be less than 10MB', 'error');
       return;
@@ -164,7 +150,6 @@ export default function ComprehensiveAddCoursePage() {
     }
   };
 
-  // Course handlers
   const handleCourseChange = (e) => {
     const { name, value, type } = e.target;
     setCourseData({
@@ -173,7 +158,6 @@ export default function ComprehensiveAddCoursePage() {
     });
   };
 
-  // Content handlers
   const handleContentChange = (e) => {
     const { name, value, type } = e.target;
     setContentForm({
@@ -188,7 +172,6 @@ export default function ComprehensiveAddCoursePage() {
       return false;
     }
 
-    // Validate based on content type
     switch (contentForm.type) {
       case 'video':
         if (!contentForm.youtube_url.trim()) {
@@ -224,7 +207,6 @@ export default function ComprehensiveAddCoursePage() {
 
     let finalContent = contentForm.content;
     
-    // Prepare content based on type
     switch (contentForm.type) {
       case 'video':
         const videoId = extractYouTubeId(contentForm.youtube_url);
@@ -247,22 +229,19 @@ export default function ComprehensiveAddCoursePage() {
     const newContent = {
       ...contentForm,
       content: finalContent,
-      id: Date.now(), // Temporary ID
+      id: Date.now(),
       order_index: contentList.length + 1
     };
 
     if (editingContentIndex !== null) {
-      // Update existing content
       const updatedList = [...contentList];
       updatedList[editingContentIndex] = newContent;
       setContentList(updatedList);
       setEditingContentIndex(null);
     } else {
-      // Add new content
       setContentList([...contentList, newContent]);
     }
 
-    // Reset form
     resetContentForm();
   };
 
@@ -284,8 +263,6 @@ export default function ComprehensiveAddCoursePage() {
   const editContent = (index) => {
     const content = contentList[index];
     let formData = { ...content };
-
-    // Parse content based on type
     try {
       if (content.type === 'video' || content.type === 'pdf') {
         const parsedContent = JSON.parse(content.content);
@@ -306,7 +283,6 @@ export default function ComprehensiveAddCoursePage() {
         }
       }
     } catch (e) {
-      // If content is not JSON, use as is
     }
 
     setContentForm(formData);
@@ -379,7 +355,6 @@ export default function ComprehensiveAddCoursePage() {
         );
       }
     } catch (e) {
-      // If content is not JSON, show regular content
     }
     
     return null;
@@ -422,7 +397,6 @@ export default function ComprehensiveAddCoursePage() {
     setIsLoading(true);
 
     try {
-      // 1. Insert course
       const coursePayload = {
         ...courseData,
         created_by: currentUser?.id || null,
@@ -442,8 +416,6 @@ export default function ComprehensiveAddCoursePage() {
       }
 
       const courseId = courseResult[0].id;
-
-      // 2. Insert content if any
       if (contentList.length > 0) {
         const contentPayload = contentList.map((content, index) => ({
           course_id: courseId,
@@ -469,7 +441,6 @@ export default function ComprehensiveAddCoursePage() {
 
       showMessage(`Course "${courseData.title}" created successfully with ${contentList.length} content items!`, 'success');
 
-      // Reset forms
       setCourseData({
         title: '',
         description: '',
@@ -485,7 +456,6 @@ export default function ComprehensiveAddCoursePage() {
       setContentList([]);
       setActiveStep(1);
 
-      // Redirect after 2 seconds
       setTimeout(() => {
         router.push('/dashboard/admin');
       }, 2000);
@@ -500,7 +470,6 @@ export default function ComprehensiveAddCoursePage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -533,7 +502,6 @@ export default function ComprehensiveAddCoursePage() {
           </div>
         </div>
 
-        {/* Progress Steps */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center">
             <div className={`flex items-center ${activeStep >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
@@ -556,7 +524,6 @@ export default function ComprehensiveAddCoursePage() {
           </div>
         </div>
 
-        {/* Alert Message */}
         {message.text && (
           <div className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success' 
@@ -579,9 +546,7 @@ export default function ComprehensiveAddCoursePage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Step 1: Course Information */}
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
@@ -601,7 +566,6 @@ export default function ComprehensiveAddCoursePage() {
               {activeStep === 1 && (
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Title */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <HiAcademicCap className="inline mr-2" />
@@ -617,8 +581,6 @@ export default function ComprehensiveAddCoursePage() {
                         required
                       />
                     </div>
-
-                    {/* Description */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Course Description *
@@ -633,8 +595,6 @@ export default function ComprehensiveAddCoursePage() {
                         required
                       />
                     </div>
-
-                    {/* Instructor Name */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Instructor Name *
@@ -649,8 +609,6 @@ export default function ComprehensiveAddCoursePage() {
                         required
                       />
                     </div>
-
-                    {/* Level */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Course Level *
@@ -666,8 +624,6 @@ export default function ComprehensiveAddCoursePage() {
                         <option value="advanced">🔴 Advanced</option>
                       </select>
                     </div>
-
-                    {/* Duration */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <HiClock className="inline mr-2" />
@@ -683,8 +639,6 @@ export default function ComprehensiveAddCoursePage() {
                         required
                       />
                     </div>
-
-                    {/* Price */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <HiCurrencyDollar className="inline mr-2" />
@@ -701,7 +655,6 @@ export default function ComprehensiveAddCoursePage() {
                       />
                     </div>
 
-                    {/* Thumbnail */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         <HiPhotograph className="inline mr-2" />
@@ -728,8 +681,6 @@ export default function ComprehensiveAddCoursePage() {
                         </div>
                       )}
                     </div>
-
-                    {/* Status */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Status
@@ -745,8 +696,6 @@ export default function ComprehensiveAddCoursePage() {
                         <option value="archived">📦 Archived</option>
                       </select>
                     </div>
-
-                    {/* Rating */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Initial Rating (0-5)
@@ -777,8 +726,6 @@ export default function ComprehensiveAddCoursePage() {
                 </div>
               )}
             </div>
-
-            {/* Step 2: Course Content */}
             {activeStep === 2 && (
               <div className="bg-white rounded-lg shadow-sm">
                 <div className="p-6 border-b border-gray-200">
@@ -798,7 +745,6 @@ export default function ComprehensiveAddCoursePage() {
                 </div>
 
                 <div className="p-6">
-                  {/* Content Form */}
                   {showContentForm && (
                     <div className="bg-gray-50 rounded-lg p-6 mb-6">
                       <div className="flex items-center justify-between mb-4">
@@ -860,8 +806,6 @@ export default function ComprehensiveAddCoursePage() {
                             placeholder="e.g., 15 minutes"
                           />
                         </div>
-
-                        {/* YouTube URL field for video content */}
                         {contentForm.type === 'video' && (
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -902,7 +846,6 @@ export default function ComprehensiveAddCoursePage() {
                           </div>
                         )}
 
-                        {/* PDF Upload field for PDF content */}
                         {contentForm.type === 'pdf' && (
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1018,7 +961,6 @@ export default function ComprehensiveAddCoursePage() {
                     </div>
                   )}
 
-                  {/* Content List */}
                   <div className="space-y-4">
                     {contentList.length === 0 ? (
                       <div className="text-center py-12">
@@ -1055,10 +997,8 @@ export default function ComprehensiveAddCoursePage() {
                                   </span>
                                 </div>
                                 
-                                {/* Content preview based on type */}
                                 {renderContentPreview(content)}
                                 
-                                {/* Regular content description */}
                                 {content.type === 'lesson' || content.type === 'quiz' || content.type === 'assignment' ? (
                                   <p className="text-gray-600 text-sm line-clamp-2 mb-2">
                                     {content.content.length > 100 
@@ -1066,7 +1006,6 @@ export default function ComprehensiveAddCoursePage() {
                                       : content.content}
                                   </p>
                                 ) : (
-                                  // For video and PDF, show description from parsed content
                                   (() => {
                                     try {
                                       const parsedContent = JSON.parse(content.content);
@@ -1117,9 +1056,7 @@ export default function ComprehensiveAddCoursePage() {
             )}
           </div>
 
-          {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Course Preview */}
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-4">
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -1169,7 +1106,6 @@ export default function ComprehensiveAddCoursePage() {
               </div>
             </div>
 
-            {/* Content Summary */}
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-800">Content Summary</h3>
@@ -1201,8 +1137,6 @@ export default function ComprehensiveAddCoursePage() {
                 </div>
               </div>
             </div>
-
-            {/* Course Data Summary */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h3 className="font-semibold text-blue-800 mb-3">Course Data</h3>
               <div className="text-blue-700 text-sm space-y-2">
@@ -1234,8 +1168,6 @@ export default function ComprehensiveAddCoursePage() {
                 </div>
               </div>
             </div>
-
-            {/* Action Buttons */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="font-semibold text-gray-800 mb-4">Actions</h3>
               <div className="space-y-3">

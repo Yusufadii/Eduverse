@@ -7,17 +7,14 @@ import Header from "@/components/navbar/page";
 import Footer from "@/components/footer/page";
 import Link from 'next/link';
 
-// Konfigurasi Supabase - pastikan sama dengan AuthForms
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
 export default function Homepage() {
-  // Users state - TAMBAHKAN INI
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState(null);
 
-  // Courses state
   const [courses, setCourses] = useState([]);
   const [courseSearchTerm, setCourseSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all');
@@ -27,7 +24,6 @@ export default function Homepage() {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Fetch Users
   const fetchUsers = async () => {
     try {
       setUsersLoading(true);
@@ -50,8 +46,7 @@ export default function Homepage() {
       setUsersLoading(false);
     }
   };
-
-  // Fetch Courses
+  
   const fetchCourses = async () => {
     try {
       setCoursesLoading(true);
@@ -80,8 +75,6 @@ export default function Homepage() {
     fetchUsers();
     fetchCourses();
   }, []);
-
-  // Rest of your component code...
   return (
     <>
     <Header/>

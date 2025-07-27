@@ -1,14 +1,11 @@
-// app/AuthForms/page.jsx
 "use client";
 import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
 
-// Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
-// Inisialisasi Supabase client
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export default function AuthFormsPage() {
@@ -70,18 +67,13 @@ export default function AuthFormsPage() {
         return;
       }
 
-      // ✅ Cek status user - jika inactive tidak bisa login
       if (data.status === 'inactive') {
         showMessage('Akun Anda sudah dinonaktifkan. Hubungi administrator untuk mengaktifkan kembali.', 'error');
         return;
       }
 
       showMessage(`Selamat datang, ${data.nama || data.email}!`, 'success');
-      
-      // Simpan data user ke localStorage
       localStorage.setItem('currentUser', JSON.stringify(data));
-      
-      // Redirect berdasarkan role setelah 1.5 detik
       setTimeout(() => {
         if (data.role === 'admin') {
           router.push('/dashboard/admin');
@@ -110,7 +102,6 @@ export default function AuthFormsPage() {
     }
 
     try {
-      // Cek apakah email sudah terdaftar
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
         .select('email')
@@ -128,7 +119,6 @@ export default function AuthFormsPage() {
         return;
       }
 
-      // Insert user baru ke table users
       const { data, error } = await supabase
         .from('users')
         .insert([
@@ -189,7 +179,6 @@ export default function AuthFormsPage() {
         )}
         
         {isLoginForm ? (
-          // Login Form
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -233,7 +222,6 @@ export default function AuthFormsPage() {
             </p>
           </div>
         ) : (
-          // Register Form
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

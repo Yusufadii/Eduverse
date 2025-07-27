@@ -1,7 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "@/components/footer/page";
-import ConditionalNavbar from "@/components/navbar/page";
 
 export const metadata = {
   title: "Eduverse",

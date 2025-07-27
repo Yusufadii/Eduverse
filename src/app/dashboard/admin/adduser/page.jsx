@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { HiArrowLeft, HiPlus, HiUser, HiMail, HiLockClosed, HiUserGroup } from 'react-icons/hi';
 
-// Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -33,7 +32,6 @@ export default function AddUserPage() {
 
   const showMessage = (text, type) => {
     setMessage({ text, type });
-    // Auto hide message after 5 seconds
     setTimeout(() => {
       setMessage({ text: '', type: '' });
     }, 5000);
@@ -52,7 +50,6 @@ export default function AddUserPage() {
       return false;
     }
 
-    // Validasi format email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       showMessage('Format email tidak valid', 'error');
@@ -85,7 +82,6 @@ export default function AddUserPage() {
     setIsLoading(true);
 
     try {
-      // Cek apakah email sudah terdaftar
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
         .select('email')
@@ -104,7 +100,6 @@ export default function AddUserPage() {
         return;
       }
 
-      // Insert user baru
       const { data, error } = await supabase
         .from('users')
         .insert([
@@ -126,7 +121,6 @@ export default function AddUserPage() {
 
       showMessage(`User ${formData.nama} berhasil ditambahkan!`, 'success');
       
-      // Reset form
       setFormData({
         nama: '',
         email: '',
@@ -135,8 +129,6 @@ export default function AddUserPage() {
         role: 'user',
         status: 'active'
       });
-
-      // Redirect ke halaman users setelah 2 detik
       setTimeout(() => {
         router.push('/dashboard/admin/');
       }, 2000);
@@ -163,7 +155,6 @@ export default function AddUserPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -187,8 +178,6 @@ export default function AddUserPage() {
             </div>
           </div>
         </div>
-
-        {/* Alert Message */}
         {message.text && (
           <div className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success' 
@@ -209,8 +198,6 @@ export default function AddUserPage() {
             </div>
           </div>
         )}
-
-        {/* Form */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800">Informasi User</h2>
@@ -219,7 +206,6 @@ export default function AddUserPage() {
 
           <form onSubmit={handleSubmit} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Nama */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiUser className="inline mr-2" />
@@ -235,8 +221,6 @@ export default function AddUserPage() {
                   required
                 />
               </div>
-
-              {/* Email */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiMail className="inline mr-2" />
@@ -252,8 +236,6 @@ export default function AddUserPage() {
                   required
                 />
               </div>
-
-              {/* Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiLockClosed className="inline mr-2" />
@@ -269,8 +251,6 @@ export default function AddUserPage() {
                   required
                 />
               </div>
-
-              {/* Confirm Password */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiLockClosed className="inline mr-2" />
@@ -287,7 +267,6 @@ export default function AddUserPage() {
                 />
               </div>
 
-              {/* Role */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <HiUserGroup className="inline mr-2" />
@@ -304,7 +283,6 @@ export default function AddUserPage() {
                 </select>
               </div>
 
-              {/* Status */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Status *
@@ -321,7 +299,6 @@ export default function AddUserPage() {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-4 mt-8">
               <button
                 type="submit"
@@ -357,7 +334,6 @@ export default function AddUserPage() {
           </form>
         </div>
 
-        {/* Info Card */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-semibold text-blue-800 mb-2">ℹ️ Informasi:</h3>
           <ul className="text-blue-700 text-sm space-y-1">

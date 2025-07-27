@@ -5,7 +5,6 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { HiArrowLeft, HiPlus, HiDocument, HiPlay, HiCollection, HiPencil, HiSave } from 'react-icons/hi';
 
-// Konfigurasi Supabase
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -29,7 +28,6 @@ export default function AddSingleContentPage() {
     order_index: 1
   });
 
-  // Fetch course data dan existing content
   useEffect(() => {
     if (courseId) {
       fetchCourseData();
@@ -68,7 +66,6 @@ export default function AddSingleContentPage() {
         console.error('Error fetching existing content:', error);
       } else {
         setExistingContents(data || []);
-        // Set default order_index to next available number
         setFormData(prev => ({
           ...prev,
           order_index: (data?.length || 0) + 1
@@ -140,7 +137,6 @@ export default function AddSingleContentPage() {
 
       showMessage(`Content "${formData.title}" added successfully!`, 'success');
       
-      // Redirect back to manage content page after 2 seconds
       setTimeout(() => {
         router.push(`/dashboard/admin/courses/content/${courseId}`);
       }, 2000);
@@ -176,7 +172,6 @@ export default function AddSingleContentPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -200,8 +195,6 @@ export default function AddSingleContentPage() {
             </div>
           </div>
         </div>
-
-        {/* Alert Message */}
         {message.text && (
           <div className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success' 
@@ -224,7 +217,6 @@ export default function AddSingleContentPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-6 border-b border-gray-200">
@@ -234,7 +226,6 @@ export default function AddSingleContentPage() {
 
               <form onSubmit={handleSubmit} className="p-6">
                 <div className="space-y-6">
-                  {/* Title */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Content Title *
@@ -250,7 +241,6 @@ export default function AddSingleContentPage() {
                     />
                   </div>
 
-                  {/* Type Selection */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
                       Content Type *
@@ -285,7 +275,6 @@ export default function AddSingleContentPage() {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Content *
@@ -315,7 +304,6 @@ export default function AddSingleContentPage() {
                     </p>
                   </div>
 
-                  {/* Duration and Order */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -350,7 +338,6 @@ export default function AddSingleContentPage() {
                   </div>
                 </div>
 
-                {/* Form Buttons */}
                 <div className="flex gap-4 mt-8">
                   <button
                     type="submit"
@@ -385,9 +372,7 @@ export default function AddSingleContentPage() {
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Preview */}
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-800">Preview</h3>
@@ -429,7 +414,6 @@ export default function AddSingleContentPage() {
               </div>
             </div>
 
-            {/* Existing Content */}
             <div className="bg-white rounded-lg shadow-sm">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-800">Existing Content ({existingContents.length})</h3>
@@ -463,7 +447,6 @@ export default function AddSingleContentPage() {
               </div>
             </div>
 
-            {/* Course Info */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h3 className="font-semibold text-blue-800 mb-2">Course Info</h3>
               <div className="text-blue-700 text-sm space-y-1">
@@ -475,7 +458,6 @@ export default function AddSingleContentPage() {
               </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="font-semibold text-gray-800 mb-3">Quick Actions</h3>
               <div className="space-y-2">

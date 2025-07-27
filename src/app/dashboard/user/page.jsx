@@ -20,7 +20,6 @@ import {
   Award
 } from 'lucide-react';
 
-// Konfigurasi Supabase dengan session management yang lebih baik
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -51,8 +50,7 @@ const UserDashboard = () => {
   const [myCourses, setMyCourses] = useState([]);
   const [user, setUser] = useState(null);
   
-  // Course Detail State
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' or 'course-detail'
+  const [currentView, setCurrentView] = useState('dashboard');
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseContent, setCourseContent] = useState([]);
   const [selectedContent, setSelectedContent] = useState(null);
@@ -63,10 +61,8 @@ const UserDashboard = () => {
   useEffect(() => {
     console.log('Component mounted, initializing...');
     
-    // Check custom auth dari localStorage DULU
     const initializeAuth = async () => {
       try {
-        // Cek localStorage untuk custom auth
         const currentUserStr = localStorage.getItem('currentUser');
         console.log('LocalStorage currentUser:', currentUserStr);
         
@@ -74,7 +70,6 @@ const UserDashboard = () => {
           const currentUser = JSON.parse(currentUserStr);
           console.log('Found currentUser in localStorage:', currentUser);
           
-          // Convert custom user ke format Supabase-like
           const supabaseUser = {
             id: currentUser.id,
             email: currentUser.email,
@@ -91,7 +86,6 @@ const UserDashboard = () => {
         } else {
           console.log('No currentUser in localStorage, checking Supabase session...');
           
-          // Fallback ke Supabase session (jika ada)
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           console.log('Supabase session check:', { session, sessionError });
           
@@ -112,15 +106,12 @@ const UserDashboard = () => {
     initializeAuth();
     fetchCoursesInitial();
     
-    // Listen untuk auth state changes (Supabase)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Supabase auth state changed:', { event, user: session?.user });
       
-      // Jika ada session Supabase, gunakan itu
       if (session?.user) {
         setUser(session.user);
       }
-      // Jika tidak ada session dan tidak ada localStorage, set null
       else if (!localStorage.getItem('currentUser')) {
         setUser(null);
       }
@@ -146,7 +137,6 @@ const UserDashboard = () => {
     try {
       console.log('Manual checking user...');
       
-      // Check localStorage first (custom auth)
       const currentUserStr = localStorage.getItem('currentUser');
       console.log('localStorage currentUser:', currentUserStr);
       
@@ -154,7 +144,6 @@ const UserDashboard = () => {
         const currentUser = JSON.parse(currentUserStr);
         console.log('Found custom user:', currentUser);
         
-        // Convert ke format Supabase-like
         const supabaseUser = {
           id: currentUser.id,
           email: currentUser.email,
@@ -170,7 +159,6 @@ const UserDashboard = () => {
         return;
       }
       
-      // Fallback ke Supabase auth
       const { data: { user }, error } = await supabase.auth.getUser();
       console.log('Supabase user check result:', { user, error });
       
@@ -203,14 +191,12 @@ const UserDashboard = () => {
       setLoading(true);
       console.log('Fetching courses...');
       
-      // Test koneksi dasar dulu
       const { data: testData, error: testError } = await supabase
         .from('courses')
         .select('count', { count: 'exact' });
       
       console.log('Test connection - Count:', testData, 'Error:', testError);
       
-      // Fetch semua courses tanpa filter dulu
       const { data: coursesData, error: coursesError } = await supabase
         .from('courses')
         .select('*');
@@ -219,7 +205,6 @@ const UserDashboard = () => {
 
       if (coursesError) {
         console.error('Courses error:', coursesError);
-        // Jangan throw error, set empty array
         setCourses([]);
       } else {
         setCourses(coursesData || []);
@@ -315,7 +300,6 @@ const UserDashboard = () => {
     console.log('Adding course to My Courses:', courseId);
 
     try {
-      // Jika user belum terdeteksi, coba ambil dari session
       let currentUser = user;
       if (!currentUser) {
         const { data: { user: sessionUser } } = await supabase.auth.getUser();
@@ -324,14 +308,12 @@ const UserDashboard = () => {
           setUser(sessionUser);
         }
       }
-
-      // Jika masih tidak ada user, kemungkinan ada masalah session
+n
       if (!currentUser) {
         alert('Session expired. Please refresh the page and login again.');
         return;
       }
 
-      // Check if already enrolled
       console.log('Checking existing enrollment...');
       const { data: existingEnrollment, error: checkError } = await supabase
         .from('enrollments')
@@ -347,14 +329,12 @@ const UserDashboard = () => {
         return;
       }
 
-      // Add course to enrollments - sesuaikan dengan struktur tabel Anda
       console.log('Adding course to enrollments...');
       const enrollmentData = {
         user_id: currentUser.id,
         course_id: courseId
       };
 
-      // Tambah field optional jika ada di tabel
       if (enrollmentData.enrolled_at !== undefined) {
         enrollmentData.enrolled_at = new Date().toISOString();
       }
@@ -373,7 +353,6 @@ const UserDashboard = () => {
         throw enrollError;
       }
 
-      // Find the course and add to myCourses
       const courseToAdd = courses.find(course => course.id === courseId);
       console.log('Course to add:', courseToAdd);
       
@@ -399,8 +378,7 @@ const UserDashboard = () => {
   const handleOpenCourse = async (course) => {
     setSelectedCourse(course);
     setCurrentView('course-detail');
-    
-    // Fetch course content
+
     try {
       const { data, error } = await supabase
         .from('course_content')
@@ -415,9 +393,7 @@ const UserDashboard = () => {
         setSelectedContent(data[0]);
       }
 
-      // Fetch user progress if enrolled
       if (isEnrolled(course.id)) {
-        // Ambil user dari session jika belum ada
         let currentUser = user;
         if (!currentUser) {
           const { data: { user: sessionUser } } = await supabase.auth.getUser();
@@ -428,7 +404,6 @@ const UserDashboard = () => {
           console.log('=== LOADING PROGRESS START ===');
           console.log('Loading progress for user:', currentUser.id, 'course:', course.id);
           
-          // Langsung gunakan localStorage untuk simplicity
           const storageKey = `progress_${currentUser.id}_${course.id}`;
           console.log('Loading from storage key:', storageKey);
           
@@ -458,7 +433,6 @@ const UserDashboard = () => {
     console.log('Selected Course:', selectedCourse?.id);
     console.log('User:', user?.id);
     
-    // Sama seperti handleAddToMyCourse, ambil user dari session jika belum ada
     let currentUser = user;
     if (!currentUser) {
       console.log('No user in state, getting from session...');
@@ -488,7 +462,6 @@ const UserDashboard = () => {
     console.log('Content ID:', contentId);
 
     try {
-      // Langsung gunakan localStorage untuk simplicity
       console.log('📱 Using localStorage for progress tracking');
       
       const storageKey = `progress_${currentUser.id}_${selectedCourse.id}`;
@@ -661,11 +634,9 @@ const UserDashboard = () => {
     </div>
   );
 
-  // Course Detail View
   if (currentView === 'course-detail' && selectedCourse) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
@@ -702,7 +673,6 @@ const UserDashboard = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
             <div className="lg:col-span-2">
               {selectedContent && isEnrolled(selectedCourse.id) ? (
                 <div className="bg-white rounded-lg shadow-md p-6">
@@ -806,8 +776,6 @@ const UserDashboard = () => {
                 </div>
               )}
             </div>
-
-            {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -874,7 +842,6 @@ const UserDashboard = () => {
     );
   }
 
-  // Dashboard View
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -904,7 +871,6 @@ const UserDashboard = () => {
               </div>
             )}
         </div>
-        {/* Navigation Tabs */}
         <div className="my-8">
           <nav className="flex space-x-8">
             <button
@@ -930,7 +896,6 @@ const UserDashboard = () => {
           </nav>
         </div>
 
-        {/* Search and Filters */}
         <div className="mb-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex-1 max-w-md">
@@ -962,7 +927,6 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        {/* Course Content */}
         {filteredCourses().length === 0 ? (
           <div className="text-center py-12">
             <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -978,7 +942,6 @@ const UserDashboard = () => {
               }
             </p>
             
-            {/* Add test button to create sample course */}
             {courses.length === 0 && (
               <button
                 onClick={createSampleCourse}

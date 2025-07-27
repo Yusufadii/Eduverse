@@ -19,7 +19,6 @@ import {
   HiDuplicate
 } from 'react-icons/hi';
 
-// Konfigurasi Supabase - pastikan sama dengan AuthForms
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
@@ -38,7 +37,6 @@ export default function ManageContentPage() {
   const [selectedType, setSelectedType] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch course data dan content
   useEffect(() => {
     if (courseId) {
       fetchCourseData();
@@ -189,7 +187,6 @@ export default function ManageContentPage() {
     }
   };
 
-  // Filter content
   const filteredContents = contents.filter(content => {
     const matchesType = selectedType === 'all' || content.type === selectedType;
     const matchesSearch = content.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -224,7 +221,6 @@ export default function ManageContentPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -258,7 +254,6 @@ export default function ManageContentPage() {
           </div>
         </div>
 
-        {/* Course Info Cards */}
         {course && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -285,8 +280,6 @@ export default function ManageContentPage() {
             </div>
           </div>
         )}
-
-        {/* Alert Message */}
         {message.text && (
           <div className={`mb-6 p-4 rounded-lg border ${
             message.type === 'success' 
@@ -307,8 +300,6 @@ export default function ManageContentPage() {
             </div>
           </div>
         )}
-
-        {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex items-center gap-4 w-full md:w-auto">
@@ -339,7 +330,6 @@ export default function ManageContentPage() {
           </div>
         </div>
 
-        {/* Content List */}
         <div className="bg-white rounded-lg shadow-sm">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800">Course Content</h2>
@@ -417,7 +407,6 @@ export default function ManageContentPage() {
                       </div>
                       
                       <div className="flex items-center gap-2 ml-4">
-                        {/* Reorder buttons */}
                         <div className="flex flex-col gap-1">
                           <button
                             onClick={() => moveUp(index)}
@@ -444,8 +433,6 @@ export default function ManageContentPage() {
                             <HiArrowDown className="text-sm" />
                           </button>
                         </div>
-                        
-                        {/* Action buttons */}
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => duplicateContent(content)}
@@ -478,7 +465,6 @@ export default function ManageContentPage() {
           </div>
         </div>
 
-        {/* Course Actions */}
         <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
           <h3 className="font-semibold text-gray-800 mb-4">Course Actions</h3>
           <div className="flex flex-wrap gap-3">

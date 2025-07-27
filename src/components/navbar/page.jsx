@@ -62,12 +62,10 @@ export default function Header() {
   return (
     <div className="shadow-[0_6px_10px_rgba(0,0,0,0.06)] bg-white">
       <div className="flex justify-between items-center max-w-screen-xl mx-auto py-6 px-4">
-        {/* Logo */}
         <div>
           <Image src="/images/Logo.png" width={150} height={150} alt="Eduverse Logo" />
         </div>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex gap-10 items-center">
           <button className={navItemClass('home')} onClick={() => scrollToSection('home')}>
             Home
@@ -84,8 +82,6 @@ export default function Header() {
             </button>
           </Link>
         </div>
-
-        {/* Mobile Hamburger */}
         <div className="md:hidden">
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-3xl text-[#131313]">
             {menuOpen ? <HiOutlineX /> : <HiOutlineMenuAlt3 />}
@@ -93,7 +89,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden flex flex-col items-start gap-5 pb-6 ps-5">
           <button className={navItemClass('home')} onClick={() => scrollToSection('home')}>
@@ -105,8 +100,6 @@ export default function Header() {
           <button className={navItemClass('courses')} onClick={() => scrollToSection('courses')}>
             Courses
           </button>
-          
-          {/* Mobile Auth Buttons */}
           <button className="bg-[#0066FF] px-6 py-2 text-[18px] font-bold text-white rounded-lg hover:bg-[#0049B7] transition-all ease-in-out duration-500 w-fit">
             Join Us!
           </button>

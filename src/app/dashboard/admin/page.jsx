@@ -5,12 +5,10 @@ import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { HiPlus, HiAcademicCap, HiUsers, HiEye, HiPencil, HiTrash, HiUser } from 'react-icons/hi';
 
-// Konfigurasi Supabase - pastikan sama dengan AuthForms
 const SUPABASE_URL = 'https://pdwoywubzmbhtjistdql.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkd295d3Viem1iaHRqaXN0ZHFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MTY4MTgsImV4cCI6MjA2ODk5MjgxOH0.txxqW32gKoNYTCkJLZ1wpWekyf2ATrVqIQRjVMCBWhg';
 
 export default function AdminDashboard() {
-  // Users state
   const [users, setUsers] = useState([]);
   const [userSearchTerm, setUserSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
@@ -18,7 +16,6 @@ export default function AdminDashboard() {
   const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState(null);
 
-  // Courses state
   const [courses, setCourses] = useState([]);
   const [courseSearchTerm, setCourseSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('all');
@@ -26,12 +23,10 @@ export default function AdminDashboard() {
   const [coursesLoading, setCoursesLoading] = useState(true);
   const [coursesError, setCoursesError] = useState(null);
 
-  // Tab state
   const [activeTab, setActiveTab] = useState('users');
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Fetch Users
   const fetchUsers = async () => {
     try {
       setUsersLoading(true);
@@ -55,7 +50,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Fetch Courses
   const fetchCourses = async () => {
     try {
       setCoursesLoading(true);
@@ -85,7 +79,6 @@ export default function AdminDashboard() {
     fetchCourses();
   }, []);
 
-  // Delete User
   const handleDeleteUser = async (id) => {
     const confirmDelete = confirm('Yakin mau hapus user ini?');
     if (!confirmDelete) return;
@@ -120,7 +113,6 @@ export default function AdminDashboard() {
   }
 };
 
-  // Delete Course
   const handleDeleteCourse = async (id, title) => {
     const confirmDelete = confirm(`Yakin mau hapus course "${title}"?`);
     if (!confirmDelete) return;
@@ -144,7 +136,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Filter Users
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       (user?.nama?.toLowerCase().includes(userSearchTerm.toLowerCase()) || '') ||
@@ -156,7 +147,6 @@ export default function AdminDashboard() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  // Filter Courses
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
       (course?.title?.toLowerCase().includes(courseSearchTerm.toLowerCase()) || '') ||
@@ -168,7 +158,6 @@ export default function AdminDashboard() {
     return matchesSearch && matchesLevel && matchesStatus;
   });
 
-  // Format Price
   const formatPrice = (price) => {
     if (price === 0) return 'Free';
     return new Intl.NumberFormat('id-ID', {
@@ -179,8 +168,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="w-screen max-w-screen-xl mx-auto px-4 gap-10 bg-white mt-10 text-[#131313]">
-      {/* Header */}
-
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-[40px] font-bold mb-2">Admin Dashboard</h1>
@@ -193,8 +180,6 @@ export default function AdminDashboard() {
           Logout
         </button>
       </div>
-
-      {/* Overall Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center gap-3">
@@ -238,7 +223,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="mb-6">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
@@ -268,10 +252,8 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Users Tab */}
       {activeTab === 'users' && (
         <div>
-          {/* Users Filters */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div className="flex items-center gap-4 w-full md:w-auto">
               <input
@@ -314,7 +296,6 @@ export default function AdminDashboard() {
             </Link>
           </div>
 
-          {/* Users Table */}
           {usersLoading ? (
             <div className="flex justify-center items-center py-20">
               <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -392,10 +373,8 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Courses Tab */}
       {activeTab === 'courses' && (
         <div>
-          {/* Courses Filters */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div className="flex items-center gap-4 w-full md:w-auto">
               <input
@@ -440,8 +419,6 @@ export default function AdminDashboard() {
               </button>
             </Link>
           </div>
-
-          {/* Courses Table */}
           {coursesLoading ? (
             <div className="flex justify-center items-center py-20">
               <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
