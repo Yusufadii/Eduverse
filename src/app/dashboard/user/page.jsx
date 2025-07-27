@@ -255,14 +255,9 @@ const UserDashboard = () => {
   const handleLogout = async () => {
     try {
       console.log('Logging out...');
-      
-      // Clear custom auth data
       localStorage.removeItem('currentUser');
-      
-      // Clear Supabase session jika ada
+
       await supabase.auth.signOut();
-      
-      // Clear state
       setUser(null);
       setMyCourses([]);
       setCurrentView('dashboard');
@@ -271,15 +266,13 @@ const UserDashboard = () => {
       setSelectedContent(null);
       setCompletedContent([]);
       
-      // Redirect ke auth page
-      window.location.href = '/home';
-      
+      window.location.href = '/';
+
     } catch (error) {
       console.error('Error during logout:', error);
-      // Tetap clear state meskipun ada error
       setUser(null);
       setMyCourses([]);
-      window.location.href = '/home';
+      window.location.href = '/';
     }
   };
 

@@ -111,14 +111,9 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
   try {
-    // Hapus session di localStorage (kalau lo pake custom user)
     localStorage.removeItem('currentUser');
-
-    // Logout Supabase session
     await supabase.auth.signOut();
-
-    // Redirect ke halaman login atau landing page
-    window.location.href = '/home'; // ubah sesuai routing lo
+    window.location.href = '/';
   } catch (error) {
     console.error('Logout gagal:', error);
     alert('Terjadi kesalahan saat logout');
