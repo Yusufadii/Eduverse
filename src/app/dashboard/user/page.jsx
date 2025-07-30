@@ -308,7 +308,7 @@ const UserDashboard = () => {
           setUser(sessionUser);
         }
       }
-n
+      
       if (!currentUser) {
         alert('Session expired. Please refresh the page and login again.');
         return;

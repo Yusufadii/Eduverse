@@ -393,9 +393,7 @@ export default function ComprehensiveAddCoursePage() {
 
   const handleSubmit = async () => {
     if (!validateCourse()) return;
-
     setIsLoading(true);
-
     try {
       const coursePayload = {
         ...courseData,
