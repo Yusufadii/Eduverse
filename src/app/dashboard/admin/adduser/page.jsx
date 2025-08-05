@@ -159,7 +159,7 @@ export default function AddUserPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link 
-                href="/dashboard/admin/users"
+                href="/dashboard/admin"
                 className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
               >
                 <HiArrowLeft className="text-xl" />
